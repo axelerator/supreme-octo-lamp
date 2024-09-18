@@ -3,23 +3,40 @@ module Main exposing (main)
 import Browser
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Html.Attributes exposing (id)
 
 main =
-  Browser.sandbox { init = 0, update = update, view = view }
+  Browser.element { init = init , update = update, view = view, subscriptions = \_ -> Sub.none }
 
-type Msg = Increment | Decrement
+init (numBombs, width, height) =
+  ( [ List.repeat numBombs { visibility = Hidden, content = Bomb} 
+  , List.repeat (width * height - numBombs) { visibility = Hidden, content = Empty }
+  ] |> List.concat
+  , Cmd.none
+  )
 
-update msg model =
+type Msg = ClickedField Int
+type FieldContent = Empty | Bomb
+type Visibility = Visible | Hidden
+
+update msg board =
   case msg of
-    Increment ->
-      model + 1
+    ClickedField idx ->
+      (List.indexedMap (reveal idx) board, Cmd.none)
 
-    Decrement ->
-      model - 1
+reveal target currentIdx field =
+  if target == currentIdx then
+    { field | visibility = Visible }
+  else
+    field
 
-view model =
-  div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (String.fromInt model) ]
-    , button [ onClick Increment ] [ text "+" ]
-    ]
+
+view fields =
+  div [id "board"]
+    (List.indexedMap viewField fields) 
+
+viewField idx {visibility, content} =
+  case (visibility, content) of
+    (Visible, Empty) -> div [] [text " "]
+    (Visible, Bomb) -> div [] [text "💣"]
+    _ -> div [onClick (ClickedField idx)] [text "?"]
