@@ -23,7 +23,7 @@ type Mode
     | InMenu
 
 
-main : Program ( Int, Int, Int ) Model Msg
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
@@ -33,10 +33,10 @@ main =
         }
 
 
-init : ( Int, Int, Int ) -> ( Model, Cmd Msg )
-init ( numBombs, width, height ) =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( { board =
-            { fields = Array.empty, width = width, height = height }
+            { fields = Array.empty, width = 1, height = 1 }
       , mode = InMenu
       , size = 4
       , bombMult = 1
