@@ -5531,7 +5531,9 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			board: {fields: $elm$core$Array$empty, height: height, width: width},
-			mode: $author$project$Main$InMenu
+			bombMult: 1,
+			mode: $author$project$Main$InMenu,
+			size: 4
 		},
 		A2(
 			$elm$random$Random$generate,
@@ -5891,8 +5893,21 @@ var $author$project$Board$clickedField = F2(
 			return board;
 		}
 	});
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5922,11 +5937,36 @@ var $author$project$Main$update = F2(
 						model,
 						{mode: $author$project$Main$InGame}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'ClickedBackToMenu':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{mode: $author$project$Main$InMenu}),
+					$elm$core$Platform$Cmd$none);
+			case 'ChangedSize':
+				var size = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							bombMult: A2($elm$core$Basics$min, model.size, model.bombMult),
+							size: A2(
+								$elm$core$Maybe$withDefault,
+								model.size,
+								$elm$core$String$toInt(size))
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var mult = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							bombMult: A2(
+								$elm$core$Maybe$withDefault,
+								model.bombMult,
+								$elm$core$String$toInt(mult))
+						}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -6127,27 +6167,178 @@ var $author$project$Main$viewBoard = function (_v0) {
 					]))
 			]));
 };
+var $author$project$Main$ChangedNumBombs = function (a) {
+	return {$: 'ChangedNumBombs', a: a};
+};
+var $author$project$Main$ChangedSize = function (a) {
+	return {$: 'ChangedSize', a: a};
+};
 var $author$project$Main$ClickedStart = {$: 'ClickedStart'};
-var $author$project$Main$viewMenu = A2(
-	$elm$html$Html$div,
+var $elm$core$Basics$pow = _Basics_pow;
+var $author$project$Main$boardWidth = function (model) {
+	return A2($elm$core$Basics$pow, 2, model.size);
+};
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
+var $author$project$Main$numBombs_ = function (model) {
+	return $author$project$Main$boardWidth(model) * model.bombMult;
+};
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
 	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$id('menu')
-		]),
-	_List_fromArray(
-		[
-			$elm$html$Html$text('menu'),
-			A2(
-			$elm$html$Html$button,
-			_List_fromArray(
-				[
-					$elm$html$Html$Events$onClick($author$project$Main$ClickedStart)
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('start')
-				]))
-		]));
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewMenu = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$id('menu')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Minesweeper')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('label')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('size:')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(
+											$author$project$Main$boardWidth(model)))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('range'),
+										$elm$html$Html$Events$onInput($author$project$Main$ChangedSize),
+										$elm$html$Html$Attributes$max('7'),
+										$elm$html$Html$Attributes$value(
+										$elm$core$String$fromInt(model.size))
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('label')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('bombs:')
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(
+											$author$project$Main$numBombs_(model)))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('range'),
+										$elm$html$Html$Attributes$max(
+										$elm$core$String$fromInt(
+											$author$project$Main$boardWidth(model))),
+										$elm$html$Html$Attributes$value(
+										$elm$core$String$fromInt(model.bombMult)),
+										$elm$html$Html$Events$onInput($author$project$Main$ChangedNumBombs)
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$ClickedStart)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('start')
+							]))
+					]))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$main_,
@@ -6158,7 +6349,7 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Main$viewMenu,
+				$author$project$Main$viewMenu(model),
 				$author$project$Main$viewBoard(model)
 			]));
 };

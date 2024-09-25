@@ -3,9 +3,9 @@ module Main exposing (main)
 import Array
 import Board exposing (Board, Field, FieldContent(..), Visibility(..), calcSurrounding, clickedField)
 import Browser
-import Html exposing (button, div, main_, text)
-import Html.Attributes exposing (attribute, class, id)
-import Html.Events exposing (onClick)
+import Html exposing (button, div, h3, input, main_, text)
+import Html.Attributes exposing (attribute, class, id, type_, value)
+import Html.Events exposing (onClick, onInput)
 import Random exposing (generate)
 import Random.List exposing (shuffle)
 
@@ -13,6 +13,8 @@ import Random.List exposing (shuffle)
 type alias Model =
     { board : Board
     , mode : Mode
+    , size : Int
+    , bombMult : Int
     }
 
 
@@ -43,6 +45,8 @@ init ( numBombs, width, height ) =
     ( { board =
             { fields = Array.empty, width = width, height = height }
       , mode = InMenu
+      , size = 4
+      , bombMult = 1
       }
     , generate (GotShuffledFields width height) (shuffle unshuffled)
     )
@@ -53,6 +57,8 @@ type Msg
     | GotShuffledFields Int Int (List { visibility : Visibility, content : FieldContent })
     | ClickedStart
     | ClickedBackToMenu
+    | ChangedSize String
+    | ChangedNumBombs String
 
 
 update : Msg -> Model -> ( Model, Cmd msg )
@@ -78,6 +84,19 @@ update msg model =
             , Cmd.none
             )
 
+        ChangedSize size ->
+            ( { model
+                | size = String.toInt size |> Maybe.withDefault model.size
+                , bombMult = min model.size model.bombMult
+              }
+            , Cmd.none
+            )
+
+        ChangedNumBombs mult ->
+            ( { model | bombMult = String.toInt mult |> Maybe.withDefault model.bombMult }
+            , Cmd.none
+            )
+
 
 view : Model -> Html.Html Msg
 view model =
@@ -89,14 +108,63 @@ view model =
             else
                 "in-game"
         ]
-        [ viewMenu
+        [ viewMenu model
         , viewBoard model
         ]
 
 
-viewMenu : Html.Html Msg
-viewMenu =
-    div [ id "menu" ] [ text "menu", button [ onClick ClickedStart ] [ text "start" ] ]
+boardWidth : Model -> Int
+boardWidth model =
+    2 ^ model.size
+
+
+numBombs_ : Model -> Int
+numBombs_ model =
+    boardWidth model * model.bombMult
+
+
+viewMenu : Model -> Html.Html Msg
+viewMenu model =
+    div []
+        [ div [ id "menu" ]
+            [ h3 [] [ text "Minesweeper" ]
+            , div [ class "label" ]
+                [ div [] [ text "size:" ]
+                , div []
+                    [ boardWidth model
+                        |> String.fromInt
+                        |> text
+                    ]
+                ]
+            , div []
+                [ input
+                    [ type_ "range"
+                    , onInput ChangedSize
+                    , Html.Attributes.max "7"
+                    , value <| String.fromInt model.size
+                    ]
+                    []
+                ]
+            , div [ class "label" ]
+                [ div [] [ text "bombs:" ]
+                , div []
+                    [ numBombs_ model
+                        |> String.fromInt
+                        |> text
+                    ]
+                ]
+            , div []
+                [ input
+                    [ type_ "range"
+                    , Html.Attributes.max <| String.fromInt <| boardWidth model
+                    , value <| String.fromInt <| model.bombMult
+                    , onInput ChangedNumBombs
+                    ]
+                    []
+                ]
+            , button [ onClick ClickedStart ] [ text "start" ]
+            ]
+        ]
 
 
 viewBoard : Model -> Html.Html Msg
