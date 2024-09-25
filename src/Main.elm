@@ -35,20 +35,13 @@ main =
 
 init : ( Int, Int, Int ) -> ( Model, Cmd Msg )
 init ( numBombs, width, height ) =
-    let
-        unshuffled =
-            [ List.repeat numBombs { visibility = Hidden, content = Bomb }
-            , List.repeat (width * height - numBombs) { visibility = Hidden, content = Empty -1 }
-            ]
-                |> List.concat
-    in
     ( { board =
             { fields = Array.empty, width = width, height = height }
       , mode = InMenu
       , size = 4
       , bombMult = 1
       }
-    , generate (GotShuffledFields width height) (shuffle unshuffled)
+    , Cmd.none
     )
 
 
@@ -61,7 +54,7 @@ type Msg
     | ChangedNumBombs String
 
 
-update : Msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickedField idx ->
@@ -70,13 +63,29 @@ update msg model =
             )
 
         GotShuffledFields width height fields ->
-            ( { model | board = calcSurrounding width height fields }
+            ( { model
+                | board = calcSurrounding width height fields
+                , mode = InGame
+              }
             , Cmd.none
             )
 
         ClickedStart ->
-            ( { model | mode = InGame }
-            , Cmd.none
+            let
+                width =
+                    boardWidth model
+
+                numBombs =
+                    model.bombMult * width
+
+                unshuffled =
+                    [ List.repeat numBombs { visibility = Hidden, content = Bomb }
+                    , List.repeat (width * width - numBombs) { visibility = Hidden, content = Empty -1 }
+                    ]
+                        |> List.concat
+            in
+            ( model
+            , generate (GotShuffledFields width width) (shuffle unshuffled)
             )
 
         ClickedBackToMenu ->
