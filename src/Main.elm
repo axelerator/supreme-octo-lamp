@@ -38,7 +38,7 @@ init _ =
     ( { board =
             { fields = Array.empty, width = 1, height = 1 }
       , mode = InMenu
-      , size = 4
+      , size = 2
       , bombMult = 1
       }
     , Cmd.none
@@ -187,15 +187,24 @@ viewBoard { board } =
 
         numBombs =
             Array.filter (\{ content } -> content == Bomb) fields |> Array.length
+
+        wonView =
+            if numBombs == numHidden then
+                div [id "won"] [div [] [text "you won" ]]
+
+            else
+                text ""
     in
     div [ id "board-container" ]
-        [ div [ id "board", attribute "style" ("--width: " ++ String.fromInt width) ] <| Array.toList <| Array.indexedMap viewField fields
-        , if numBombs == numHidden then
-            text "you won"
-
-          else
-            text ""
-        , button [ onClick ClickedBackToMenu ] [ text "back" ]
+        [ div
+            [ id "board"
+            , attribute "style" ("--width: " ++ String.fromInt width)
+            ]
+          <|
+            (::) wonView <|
+                Array.toList <|
+                    Array.indexedMap viewField fields
+        , div [] [ button [ onClick ClickedBackToMenu ] [ text "back" ] ]
         ]
 
 
@@ -206,10 +215,10 @@ viewField idx { visibility, content } =
             div [] []
 
         ( Visible, Empty n ) ->
-            div [] [ text (String.fromInt n) ]
+            div [ attribute "style" <| "--bombs: " ++ String.fromInt n ] [ text (String.fromInt n) ]
 
         ( Visible, Bomb ) ->
             div [] [ text "💣" ]
 
-        _ ->
+        ( Hidden, _ ) ->
             div [ onClick (ClickedField idx), class "hidden" ] []

@@ -5251,7 +5251,7 @@ var $author$project$Main$init = function (_v0) {
 			board: {fields: $elm$core$Array$empty, height: 1, width: 1},
 			bombMult: 1,
 			mode: $author$project$Main$InMenu,
-			size: 4
+			size: 2
 		},
 		$elm$core$Platform$Cmd$none);
 };
@@ -6082,7 +6082,13 @@ var $author$project$Main$viewField = F2(
 					var n = _v1.b.a;
 					return A2(
 						$elm$html$Html$div,
-						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$Attributes$attribute,
+								'style',
+								'--bombs: ' + $elm$core$String$fromInt(n))
+							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
@@ -6101,6 +6107,7 @@ var $author$project$Main$viewField = F2(
 						]));
 			}
 		} else {
+			var _v6 = _v1.a;
 			return A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -6133,6 +6140,22 @@ var $author$project$Main$viewBoard = function (_v0) {
 				return _Utils_eq(visibility, $author$project$Board$Hidden);
 			},
 			fields));
+	var wonView = _Utils_eq(numBombs, numHidden) ? A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('won')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('you won')
+					]))
+			])) : $elm$html$Html$text('');
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -6151,18 +6174,26 @@ var $author$project$Main$viewBoard = function (_v0) {
 						'style',
 						'--width: ' + $elm$core$String$fromInt(width))
 					]),
-				$elm$core$Array$toList(
-					A2($elm$core$Array$indexedMap, $author$project$Main$viewField, fields))),
-				_Utils_eq(numBombs, numHidden) ? $elm$html$Html$text('you won') : $elm$html$Html$text(''),
 				A2(
-				$elm$html$Html$button,
+					$elm$core$List$cons,
+					wonView,
+					$elm$core$Array$toList(
+						A2($elm$core$Array$indexedMap, $author$project$Main$viewField, fields)))),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onClick($author$project$Main$ClickedBackToMenu)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('back')
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$ClickedBackToMenu)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('back')
+							]))
 					]))
 			]));
 };
