@@ -5537,17 +5537,6 @@ var $author$project$Main$init = function (_v0) {
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5604,6 +5593,17 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -5633,8 +5633,8 @@ var $author$project$Main$toIdx = F2(
 		var y = _v0.b;
 		return (y * width) + x;
 	});
-var $author$project$Main$surroundingBombs = F6(
-	function (bombLocations, width, height, fields, targetIdx, field) {
+var $author$project$Main$surroundingBombs = F5(
+	function (width, height, fields, targetIdx, field) {
 		var _v0 = _Utils_Tuple2(field.visibility, field.content);
 		if (_v0.b.$ === 'Bomb') {
 			var _v1 = _v0.b;
@@ -5687,29 +5687,10 @@ var $author$project$Main$surroundingBombs = F6(
 	});
 var $author$project$Main$calcSurrounding = F3(
 	function (width, height, fields) {
-		var bombLocations = A2(
-			$elm$core$List$map,
-			$author$project$Main$toCoords,
-			A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$first,
-				A2(
-					$elm$core$List$filter,
-					function (_v0) {
-						var content = _v0.b.content;
-						return _Utils_eq(content, $author$project$Main$Bomb);
-					},
-					A2(
-						$elm$core$List$indexedMap,
-						F2(
-							function (i, f) {
-								return _Utils_Tuple2(i, f);
-							}),
-						fields))));
 		var fieldsWithSurrunding = $elm$core$Array$fromList(
 			A2(
 				$elm$core$List$indexedMap,
-				A4($author$project$Main$surroundingBombs, bombLocations, width, height, fields),
+				A3($author$project$Main$surroundingBombs, width, height, fields),
 				fields));
 		return {fields: fieldsWithSurrunding, height: height, width: width};
 	});
