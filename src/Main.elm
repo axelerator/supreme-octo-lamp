@@ -93,10 +93,14 @@ update msg model =
             , Cmd.none
             )
 
-        ChangedSize size ->
+        ChangedSize sizeStr ->
+            let
+                size =
+                    String.toInt sizeStr |> Maybe.withDefault model.size
+            in
             ( { model
-                | size = String.toInt size |> Maybe.withDefault model.size
-                , bombMult = min model.size model.bombMult
+                | size = size
+                , bombMult = min (2 ^ size) model.bombMult
               }
             , Cmd.none
             )
@@ -190,7 +194,7 @@ viewBoard { board } =
 
         wonView =
             if numBombs == numHidden then
-                div [id "won"] [div [] [text "you won" ]]
+                div [ id "won" ] [ div [] [ text "you won" ] ]
 
             else
                 text ""

@@ -5943,16 +5943,20 @@ var $author$project$Main$update = F2(
 						{mode: $author$project$Main$InMenu}),
 					$elm$core$Platform$Cmd$none);
 			case 'ChangedSize':
-				var size = msg.a;
+				var sizeStr = msg.a;
+				var size = A2(
+					$elm$core$Maybe$withDefault,
+					model.size,
+					$elm$core$String$toInt(sizeStr));
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							bombMult: A2($elm$core$Basics$min, model.size, model.bombMult),
-							size: A2(
-								$elm$core$Maybe$withDefault,
-								model.size,
-								$elm$core$String$toInt(size))
+							bombMult: A2(
+								$elm$core$Basics$min,
+								A2($elm$core$Basics$pow, 2, size),
+								model.bombMult),
+							size: size
 						}),
 					$elm$core$Platform$Cmd$none);
 			default:
