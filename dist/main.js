@@ -5253,6 +5253,7 @@ var $author$project$Main$GotShuffledFields = F3(
 		return {$: 'GotShuffledFields', a: a, b: b, c: c};
 	});
 var $author$project$Board$Hidden = {$: 'Hidden'};
+var $author$project$Main$InMenu = {$: 'InMenu'};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5528,7 +5529,10 @@ var $author$project$Main$init = function (_v0) {
 				})
 			]));
 	return _Utils_Tuple2(
-		{fields: $elm$core$Array$empty, height: height, width: width},
+		{
+			board: {fields: $elm$core$Array$empty, height: height, width: width},
+			mode: $author$project$Main$InMenu
+		},
 		A2(
 			$elm$random$Random$generate,
 			A2($author$project$Main$GotShuffledFields, width, height),
@@ -5537,6 +5541,7 @@ var $author$project$Main$init = function (_v0) {
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$InGame = {$: 'InGame'};
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5889,21 +5894,53 @@ var $author$project$Board$clickedField = F2(
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$update = F2(
-	function (msg, board) {
-		if (msg.$ === 'ClickedField') {
-			var idx = msg.a;
-			return _Utils_Tuple2(
-				A2($author$project$Board$clickedField, idx, board),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var width = msg.a;
-			var height = msg.b;
-			var fields = msg.c;
-			return _Utils_Tuple2(
-				A3($author$project$Board$calcSurrounding, width, height, fields),
-				$elm$core$Platform$Cmd$none);
+	function (msg, model) {
+		switch (msg.$) {
+			case 'ClickedField':
+				var idx = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							board: A2($author$project$Board$clickedField, idx, model.board)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'GotShuffledFields':
+				var width = msg.a;
+				var height = msg.b;
+				var fields = msg.c;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							board: A3($author$project$Board$calcSurrounding, width, height, fields)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'ClickedStart':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{mode: $author$project$Main$InGame}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{mode: $author$project$Main$InMenu}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$main_ = _VirtualDom_node('main');
+var $author$project$Main$ClickedBackToMenu = {$: 'ClickedBackToMenu'};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -5912,6 +5949,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$Array$filter = F2(
 	function (isGood, array) {
@@ -5924,14 +5962,6 @@ var $elm$core$Array$filter = F2(
 					}),
 				_List_Nil,
 				array));
-	});
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
@@ -5976,12 +6006,6 @@ var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$ClickedField = function (a) {
-	return {$: 'ClickedField', a: a};
-};
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5998,6 +6022,11 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$html$Html$Events$on,
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$ClickedField = function (a) {
+	return {$: 'ClickedField', a: a};
 };
 var $author$project$Main$viewField = F2(
 	function (idx, _v0) {
@@ -6044,9 +6073,19 @@ var $author$project$Main$viewField = F2(
 				_List_Nil);
 		}
 	});
-var $author$project$Main$view = function (_v0) {
-	var fields = _v0.fields;
-	var width = _v0.width;
+var $author$project$Main$viewBoard = function (_v0) {
+	var board = _v0.board;
+	var _v1 = board;
+	var fields = _v1.fields;
+	var width = _v1.width;
+	var numBombs = $elm$core$Array$length(
+		A2(
+			$elm$core$Array$filter,
+			function (_v3) {
+				var content = _v3.content;
+				return _Utils_eq(content, $author$project$Board$Bomb);
+			},
+			fields));
 	var numHidden = $elm$core$Array$length(
 		A2(
 			$elm$core$Array$filter,
@@ -6055,17 +6094,12 @@ var $author$project$Main$view = function (_v0) {
 				return _Utils_eq(visibility, $author$project$Board$Hidden);
 			},
 			fields));
-	var numBombs = $elm$core$Array$length(
-		A2(
-			$elm$core$Array$filter,
-			function (_v1) {
-				var content = _v1.content;
-				return _Utils_eq(content, $author$project$Board$Bomb);
-			},
-			fields));
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$id('board-container')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6080,7 +6114,52 @@ var $author$project$Main$view = function (_v0) {
 					]),
 				$elm$core$Array$toList(
 					A2($elm$core$Array$indexedMap, $author$project$Main$viewField, fields))),
-				_Utils_eq(numBombs, numHidden) ? $elm$html$Html$text('you won') : $elm$html$Html$text('')
+				_Utils_eq(numBombs, numHidden) ? $elm$html$Html$text('you won') : $elm$html$Html$text(''),
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$ClickedBackToMenu)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('back')
+					]))
+			]));
+};
+var $author$project$Main$ClickedStart = {$: 'ClickedStart'};
+var $author$project$Main$viewMenu = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$id('menu')
+		]),
+	_List_fromArray(
+		[
+			$elm$html$Html$text('menu'),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick($author$project$Main$ClickedStart)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('start')
+				]))
+		]));
+var $author$project$Main$view = function (model) {
+	return A2(
+		$elm$html$Html$main_,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class(
+				_Utils_eq(model.mode, $author$project$Main$InMenu) ? '' : 'in-game')
+			]),
+		_List_fromArray(
+			[
+				$author$project$Main$viewMenu,
+				$author$project$Main$viewBoard(model)
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
