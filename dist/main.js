@@ -5244,15 +5244,15 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $elm$json$Json$Decode$index = _Json_decodeIndex;
-var $author$project$Main$Bomb = {$: 'Bomb'};
-var $author$project$Main$Empty = function (a) {
+var $author$project$Board$Bomb = {$: 'Bomb'};
+var $author$project$Board$Empty = function (a) {
 	return {$: 'Empty', a: a};
 };
 var $author$project$Main$GotShuffledFields = F3(
 	function (a, b, c) {
 		return {$: 'GotShuffledFields', a: a, b: b, c: c};
 	});
-var $author$project$Main$Hidden = {$: 'Hidden'};
+var $author$project$Board$Hidden = {$: 'Hidden'};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -5518,13 +5518,13 @@ var $author$project$Main$init = function (_v0) {
 				A2(
 				$elm$core$List$repeat,
 				numBombs,
-				{content: $author$project$Main$Bomb, visibility: $author$project$Main$Hidden}),
+				{content: $author$project$Board$Bomb, visibility: $author$project$Board$Hidden}),
 				A2(
 				$elm$core$List$repeat,
 				(width * height) - numBombs,
 				{
-					content: $author$project$Main$Empty(-1),
-					visibility: $author$project$Main$Hidden
+					content: $author$project$Board$Empty(-1),
+					visibility: $author$project$Board$Hidden
 				})
 			]));
 	return _Utils_Tuple2(
@@ -5614,26 +5614,26 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $elm$core$Basics$ge = _Utils_ge;
-var $author$project$Main$inBounds = F3(
+var $author$project$Board$inBounds = F3(
 	function (width, height, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		return (x >= 0) && ((y >= 0) && ((_Utils_cmp(x, width) < 0) && (_Utils_cmp(y, height) < 0)));
 	});
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$Main$toCoords = F2(
+var $author$project$Board$toCoords = F2(
 	function (width, idx) {
 		return _Utils_Tuple2(
 			A2($elm$core$Basics$modBy, width, idx),
 			(idx / width) | 0);
 	});
-var $author$project$Main$toIdx = F2(
+var $author$project$Board$toIdx = F2(
 	function (width, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		return (y * width) + x;
 	});
-var $author$project$Main$surroundingBombs = F5(
+var $author$project$Board$surroundingBombs = F5(
 	function (width, height, fields, targetIdx, field) {
 		var _v0 = _Utils_Tuple2(field.visibility, field.content);
 		if (_v0.b.$ === 'Bomb') {
@@ -5645,12 +5645,12 @@ var $author$project$Main$surroundingBombs = F5(
 					$elm$core$List$head(
 						A2(
 							$elm$core$List$drop,
-							A2($author$project$Main$toIdx, width, coords),
+							A2($author$project$Board$toIdx, width, coords),
 							fields)),
 					$elm$core$Maybe$Just(
-						{content: $author$project$Main$Bomb, visibility: $author$project$Main$Hidden}));
+						{content: $author$project$Board$Bomb, visibility: $author$project$Board$Hidden}));
 			};
-			var _v2 = A2($author$project$Main$toCoords, width, targetIdx);
+			var _v2 = A2($author$project$Board$toCoords, width, targetIdx);
 			var tx = _v2.a;
 			var ty = _v2.b;
 			var numBombs = $elm$core$List$length(
@@ -5659,7 +5659,7 @@ var $author$project$Main$surroundingBombs = F5(
 					isBomb,
 					A2(
 						$elm$core$List$filter,
-						A2($author$project$Main$inBounds, width, height),
+						A2($author$project$Board$inBounds, width, height),
 						A2(
 							$elm$core$List$map,
 							function (_v3) {
@@ -5681,20 +5681,20 @@ var $author$project$Main$surroundingBombs = F5(
 			return _Utils_update(
 				field,
 				{
-					content: $author$project$Main$Empty(numBombs)
+					content: $author$project$Board$Empty(numBombs)
 				});
 		}
 	});
-var $author$project$Main$calcSurrounding = F3(
+var $author$project$Board$calcSurrounding = F3(
 	function (width, height, fields) {
 		var fieldsWithSurrunding = $elm$core$Array$fromList(
 			A2(
 				$elm$core$List$indexedMap,
-				A3($author$project$Main$surroundingBombs, width, height, fields),
+				A3($author$project$Board$surroundingBombs, width, height, fields),
 				fields));
 		return {fields: fieldsWithSurrunding, height: height, width: width};
 	});
-var $author$project$Main$Visible = {$: 'Visible'};
+var $author$project$Board$Visible = {$: 'Visible'};
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
 var $elm$core$Array$getHelp = F3(
@@ -5777,7 +5777,7 @@ var $elm$core$Array$set = F3(
 			A4($elm$core$Array$setHelp, startShift, index, value, tree),
 			tail));
 	});
-var $author$project$Main$reveal = F2(
+var $author$project$Board$reveal = F2(
 	function (target, board) {
 		var _v0 = A2($elm$core$Array$get, target, board.fields);
 		if (_v0.$ === 'Just') {
@@ -5790,7 +5790,7 @@ var $author$project$Main$reveal = F2(
 						target,
 						_Utils_update(
 							field,
-							{visibility: $author$project$Main$Visible}),
+							{visibility: $author$project$Board$Visible}),
 						board.fields)
 				});
 		} else {
@@ -5822,7 +5822,7 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Main$revealAll = function (board) {
+var $author$project$Board$revealAll = function (board) {
 	return _Utils_update(
 		board,
 		{
@@ -5831,38 +5831,38 @@ var $author$project$Main$revealAll = function (board) {
 				function (f) {
 					return _Utils_update(
 						f,
-						{visibility: $author$project$Main$Visible});
+						{visibility: $author$project$Board$Visible});
 				},
 				board.fields)
 		});
 };
-var $author$project$Main$clickedField = F2(
+var $author$project$Board$clickedField = F2(
 	function (idx, board) {
 		var _v0 = A2($elm$core$Array$get, idx, board.fields);
 		if (_v0.$ === 'Just') {
 			var content = _v0.a.content;
 			var visibility = _v0.a.visibility;
-			if (_Utils_eq(visibility, $author$project$Main$Visible)) {
+			if (_Utils_eq(visibility, $author$project$Board$Visible)) {
 				return board;
 			} else {
 				if (content.$ === 'Bomb') {
-					return $author$project$Main$revealAll(board);
+					return $author$project$Board$revealAll(board);
 				} else {
 					if (!content.a) {
-						var withCurrentRevealed = A2($author$project$Main$reveal, idx, board);
-						var _v2 = A2($author$project$Main$toCoords, board.width, idx);
+						var withCurrentRevealed = A2($author$project$Board$reveal, idx, board);
+						var _v2 = A2($author$project$Board$toCoords, board.width, idx);
 						var tx = _v2.a;
 						var ty = _v2.b;
 						return A3(
 							$elm$core$List$foldl,
-							$author$project$Main$clickedField,
+							$author$project$Board$clickedField,
 							withCurrentRevealed,
 							A2(
 								$elm$core$List$map,
-								$author$project$Main$toIdx(board.width),
+								$author$project$Board$toIdx(board.width),
 								A2(
 									$elm$core$List$filter,
-									A2($author$project$Main$inBounds, board.width, board.height),
+									A2($author$project$Board$inBounds, board.width, board.height),
 									A2(
 										$elm$core$List$map,
 										function (_v3) {
@@ -5878,7 +5878,7 @@ var $author$project$Main$clickedField = F2(
 												_Utils_Tuple2(0, 1)
 											])))));
 					} else {
-						return A2($author$project$Main$reveal, idx, board);
+						return A2($author$project$Board$reveal, idx, board);
 					}
 				}
 			}
@@ -5893,14 +5893,14 @@ var $author$project$Main$update = F2(
 		if (msg.$ === 'ClickedField') {
 			var idx = msg.a;
 			return _Utils_Tuple2(
-				A2($author$project$Main$clickedField, idx, board),
+				A2($author$project$Board$clickedField, idx, board),
 				$elm$core$Platform$Cmd$none);
 		} else {
 			var width = msg.a;
 			var height = msg.b;
 			var fields = msg.c;
 			return _Utils_Tuple2(
-				A3($author$project$Main$calcSurrounding, width, height, fields),
+				A3($author$project$Board$calcSurrounding, width, height, fields),
 				$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -6052,7 +6052,7 @@ var $author$project$Main$view = function (_v0) {
 			$elm$core$Array$filter,
 			function (_v2) {
 				var visibility = _v2.visibility;
-				return _Utils_eq(visibility, $author$project$Main$Hidden);
+				return _Utils_eq(visibility, $author$project$Board$Hidden);
 			},
 			fields));
 	var numBombs = $elm$core$Array$length(
@@ -6060,7 +6060,7 @@ var $author$project$Main$view = function (_v0) {
 			$elm$core$Array$filter,
 			function (_v1) {
 				var content = _v1.content;
-				return _Utils_eq(content, $author$project$Main$Bomb);
+				return _Utils_eq(content, $author$project$Board$Bomb);
 			},
 			fields));
 	return A2(
